@@ -1,18 +1,3 @@
-**What We"ll Cover:**
-
-```mermaid
-flowchart TD
-	A[01 Project Walkthrough] --> B[02 Instructions]
-	B --> C[03 Prompts]
-	C --> D[04 Chat Modes]
-	D --> E[05 Code Review in VS Code]
-	E --> F[06 Code Review on GH]
-	F --> G[07 Build MCP]
-	G --> H[08 Test with Playwright]
-	H --> I[09 Playwright MCP]
-	I --> J[Questions?]
-```
-
 ### Demo 1: Instructions, Prompts, Modes
 - [ ] [01 Project Walkthrouhg](prompts/01-project-overview.md): Quick walkthrough of the project using Copilot + Running the FE/BE
 - [ ] [02 Instructions](prompts/02-generate-instructions.md): Generate copilot instructions for this project - using Copilot
