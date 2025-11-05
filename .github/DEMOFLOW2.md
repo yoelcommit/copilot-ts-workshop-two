@@ -15,8 +15,10 @@
 - [ ] [10 Playwright Tests](prompts/08-adding-e2e-playwright-tests.md): Generate frontend Playwrite tests (as AI TDD)
 - [ ] [11 QA Playwright MCP + Chat Mode](prompts/09-a-playwright-mcp-with-chatmode-vsc.md): use Playwrite MCP to add edge cases
 
-### Demo 4: CLI
-- [ ] **GitHub CLI** - /help, choose model, add docs to App.js
+### Demo 4: Copilot in CLI & github.com
+- [ ] **GitHub CLI** - /help, choose model, mcp, agents
+- [ ] [Copilot in github.com](https://github.com/copilot) - create issues, tasks, ask, explain
+
 
 **See below tips & best practices**
 
@@ -26,10 +28,12 @@
 - [ ] Context: Start a NEW session for every new task/topic!
 - [ ] Customize: via instructions, prompts (all IDEs) + chatmodes (VS Code)
 - [ ] Customize: Awesome prompts+MCPs repo at https://promptboost.dev
-- [ ] Agent: Use (or building) MCPs where it makes sense
+- [ ] Agent: Use (or build) MCPs where it makes sense
 - [ ] Agent: Never "Accpet" until happy
 - [ ] Agent: Restore Checkpoint
 - [ ] Agent: TDD (Test Driven Dev) as Agent stop condition and feedback loop
 - [ ] Agent: should run CLI commands to close feedback loop
+- [ ] Coding Agent: delegate to a background agent in the cloud
 - [ ] Models: Choosing the right models: https://docs.github.com/en/copilot/reference/ai-models/model-comparison
 - [ ] Review: Use AI for reviewing code, not just generating it
+- [ ] CLI: For a terminal-native experience
