@@ -1,4 +1,4 @@
-# Sonnet 4
+# Sonnet 4.5
 
 Create a TypeScript MCP (Model Context Protocol) server in index.ts that serves superhero data. The project uses ESM modules (type: "module" in package.json) and strict TypeScript compilation.
 
