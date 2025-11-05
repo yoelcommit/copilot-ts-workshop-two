@@ -10,8 +10,8 @@
 
 ### Demo 3: Agent+MCP, Coding Agent
 - [ ] [07 Build MCP](prompts/04-create-superheroes-mcp.prompt.md): Create a Superheroes MCP to better understand the Superhero data schema
-- [ ] **08 GitHub MCP**: Create and list issues in GitHub using MCP (issue: update mcp code documentation)
-- [ ] **09 Coding Agent**: Commit changes & assign issue to Coding Agent to work in the background
+- [ ] **08 GitHub MCP**: Create and list issues in GitHub using MCP (issue: add docs to App.js)
+- [ ] **09 Coding Agent**: #assign_copilot_to_issue / "Delegate" button - delegate to Coding Agent to work in the background
 - [ ] [10 Playwright Tests](prompts/08-adding-e2e-playwright-tests.md): Generate frontend Playwrite tests (as AI TDD)
 - [ ] [11 QA Playwright MCP + Chat Mode](prompts/09-a-playwright-mcp-with-chatmode-vsc.md): use Playwrite MCP to add edge cases
 
