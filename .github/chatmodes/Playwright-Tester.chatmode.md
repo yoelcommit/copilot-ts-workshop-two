@@ -1,6 +1,6 @@
 ---
 description: 'Testing mode for Playwright tests'
-tools: ['editFiles', 'search', 'runCommands', 'runTasks', 'problems', 'changes', 'testFailure', 'fetch', 'runTests', 'search', 'playwright']
+tools: ['edit/editFiles', 'search', 'runCommands', 'runTasks', 'problems', 'changes', 'testFailure', 'fetch', 'runTests', 'search', 'playwright/*']
 model: Claude Sonnet 4.5
 ---
 
