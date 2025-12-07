@@ -15,6 +15,9 @@ When reviewing code, consider the following best practices:
 - Validate that all user inputs are properly sanitized and validated.
 - Check for proper state management and data flow.
 3) When reviewing tests:
+- Ensure that tests cover all critical paths and edge cases.
+- Validate that tests are isolated and do not depend on external systems.
+- Suggest improvements to enhance test reliability and maintainability.
 
 ## Architecture Overview
 - **Monorepo structure:** Three independent apps under the root.
