@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
+import Login from './Login';
+import './Login.css';
 
 function App() {
   const [superheroes, setSuperheroes] = useState([]);
   const [selectedHeroes, setSelectedHeroes] = useState([]);
   const [currentView, setCurrentView] = useState('table'); // 'table' or 'comparison'
+  const [comparisonResult, setComparisonResult] = useState(null);
+  const [showLogin, setShowLogin] = useState(true);
 
   useEffect(() => {
     fetch('/api/superheroes')
@@ -34,7 +38,28 @@ function App() {
 
   const handleCompare = () => {
     if (selectedHeroes.length === 2) {
+      const id1 = selectedHeroes[0].id;
+      const id2 = selectedHeroes[1].id;
+      const hero1 = selectedHeroes[0];
+      const hero2 = selectedHeroes[1];
+
+      // Compute and show local comparison immediately so tests and UI are responsive
+      const local = computeLocalComparison(hero1, hero2);
+      setComparisonResult(local);
       setCurrentView('comparison');
+
+      // Fetch authoritative comparison from backend and update when ready
+      fetch(`/api/superheroes/compare?id1=${id1}&id2=${id2}`)
+        .then((res) => {
+          if (!res.ok) throw new Error('Compare API error');
+          return res.json();
+        })
+        .then((data) => {
+          setComparisonResult(data);
+        })
+        .catch((err) => {
+          console.error('Error comparing heroes:', err);
+        });
     }
   };
 
@@ -43,34 +68,53 @@ function App() {
     setSelectedHeroes([]);
   };
 
-  const calculateWinner = (hero1, hero2) => {
-    const stats = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
-    let hero1Score = 0;
-    let hero2Score = 0;
-    
-    stats.forEach(stat => {
-      if (hero1.powerstats[stat] > hero2.powerstats[stat]) {
-        hero1Score++;
-      } else if (hero2.powerstats[stat] > hero1.powerstats[stat]) {
-        hero2Score++;
+  // calculateWinner is no longer used; backend returns comparisonResult
+  // Local synchronous comparison to render immediately while backend fetches
+  const computeLocalComparison = (hero1, hero2) => {
+    const STAT_ORDER = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
+    const categories = [];
+    let hero1Wins = 0;
+    let hero2Wins = 0;
+
+    STAT_ORDER.forEach((stat) => {
+      const v1 = Number(hero1.powerstats[stat]) || 0;
+      const v2 = Number(hero2.powerstats[stat]) || 0;
+      let winner = 'tie';
+      if (v1 > v2) {
+        winner = 1;
+        hero1Wins++;
+      } else if (v2 > v1) {
+        winner = 2;
+        hero2Wins++;
       }
+      categories.push({ name: stat, winner, id1_value: v1, id2_value: v2 });
     });
 
-    if (hero1Score > hero2Score) {
-      return { winner: hero1, score: `${hero1Score}-${hero2Score}` };
-    } else if (hero2Score > hero1Score) {
-      return { winner: hero2, score: `${hero2Score}-${hero1Score}` };
-    } else {
-      return { winner: null, score: `${hero1Score}-${hero2Score}` };
-    }
+    let overall_winner = 'tie';
+    if (hero1Wins > hero2Wins) overall_winner = 1;
+    else if (hero2Wins > hero1Wins) overall_winner = 2;
+
+    return { id1: hero1.id, id2: hero2.id, categories, overall_winner };
+  };
+
+  const buildScoreString = (categories) => {
+    if (!categories || !Array.isArray(categories)) return '0-0';
+    const counts = categories.reduce((acc, c) => {
+      if (c.winner !== 1 && c.winner !== 2 && c.winner !== 'tie') return acc;
+      if (c.winner === 1) acc[0]++;
+      else if (c.winner === 2) acc[1]++;
+      return acc;
+    }, [0, 0]);
+    return `${counts[0]}-${counts[1]}`;
   };
 
   const renderComparison = () => {
     if (selectedHeroes.length !== 2) return null;
-    
     const [hero1, hero2] = selectedHeroes;
-    const result = calculateWinner(hero1, hero2);
     const stats = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
+
+    // If we have a backend result, use it to determine winners and overall
+    const backend = comparisonResult;
 
     return (
       <div className="comparison-view">
@@ -96,11 +140,17 @@ function App() {
         </div>
 
         <div className="stats-comparison">
-          {stats.map(stat => {
+          {stats.map((stat, idx) => {
             const stat1 = hero1.powerstats[stat];
             const stat2 = hero2.powerstats[stat];
-            const winner = stat1 > stat2 ? 'hero1' : stat1 < stat2 ? 'hero2' : 'tie';
-            
+            let winner = 'tie';
+            if (backend && backend.categories && backend.categories[idx]) {
+              const w = backend.categories[idx].winner;
+              winner = w === 1 ? 'hero1' : w === 2 ? 'hero2' : 'tie';
+            } else {
+              winner = stat1 > stat2 ? 'hero1' : stat1 < stat2 ? 'hero2' : 'tie';
+            }
+
             return (
               <div key={stat} className="stat-row">
                 <div className={`stat-value ${winner === 'hero1' ? 'winner' : ''}`}>
@@ -119,15 +169,22 @@ function App() {
 
         <div className="final-result">
           <h2>Final Result</h2>
-          {result.winner ? (
-            <div className="winner-announcement">
-              <h3>🏆 {result.winner.name} Wins!</h3>
-              <p>Score: {result.score}</p>
-            </div>
+          {comparisonResult ? (
+            comparisonResult.overall_winner === 'tie' ? (
+              <div className="tie-announcement">
+                <h3>🤝 It's a Tie!</h3>
+                <p>Score: {buildScoreString(comparisonResult.categories)}</p>
+              </div>
+            ) : (
+              <div className="winner-announcement">
+                <h3>🏆 {(comparisonResult.overall_winner === 1 ? hero1.name : hero2.name)} Wins!</h3>
+                <p>Score: {buildScoreString(comparisonResult.categories)}</p>
+              </div>
+            )
           ) : (
             <div className="tie-announcement">
               <h3>🤝 It's a Tie!</h3>
-              <p>Score: {result.score}</p>
+              <p>Score: 0-0</p>
             </div>
           )}
         </div>
@@ -200,9 +257,13 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        {currentView === 'table' ? renderTable() : renderComparison()}
-      </header>
+      {showLogin ? (
+        <Login onLogin={() => setShowLogin(false)} />
+      ) : (
+        <header className="App-header">
+          {currentView === 'table' ? renderTable() : renderComparison()}
+        </header>
+      )}
     </div>
   );
 }
