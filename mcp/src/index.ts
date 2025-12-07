@@ -41,7 +41,17 @@ async function loadSuperheroes(): Promise<Superhero[]> {
 
 // Markdown Formatting Function
 function formatSuperheroMarkdown(hero: Superhero): string {
-  return `Here is the data for ${hero.name} retrieved using the superheroes MCP:\n\n• Name: ${hero.name}\n• Image: <img src="${hero.image}" alt="${hero.name}"/>\n• Powerstats:\n  • Intelligence: ${hero.powerstats.intelligence}\n  • Strength: ${hero.powerstats.strength}\n  • Speed: ${hero.powerstats.speed}\n  • Durability: ${hero.powerstats.durability}\n  • Power: ${hero.powerstats.power}\n  • Combat: ${hero.powerstats.combat}`;
+  return `Here is the data for ${hero.name} retrieved using the superheroes MCP:
+
+• Name: ${hero.name}
+• Image: <img src="${hero.image}" alt="${hero.name}"/>
+• Powerstats:
+  • Intelligence: ${hero.powerstats.intelligence}
+  • Strength: ${hero.powerstats.strength}
+  • Speed: ${hero.powerstats.speed}
+  • Durability: ${hero.powerstats.durability}
+  • Power: ${hero.powerstats.power}
+  • Combat: ${hero.powerstats.combat}`;
 }
 
 // MCP Server Configuration
