@@ -156,7 +156,7 @@ describe('GET /api/superheroes/compare', () => {
   it('should return 400 if comparing a hero with itself', async () => {
     const response = await request(app).get('/api/superheroes/compare?id1=1&id2=1');
     expect(response.status).toBe(400);
-    expect(response.text).toMatch(/Comparing a hero with itself/);
+    expect(response.text).toBe('Bad request. Comparing a hero with itself not allowed');
   });
 
   it('returns 500 when loadSuperheroes fails', async () => {
