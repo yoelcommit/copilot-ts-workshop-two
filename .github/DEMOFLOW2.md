@@ -9,9 +9,9 @@
 - [ ] [06 Code Review on GH](https://github.com/commit-ai/copilot-ts-workshop-two/pull/14): get copilot reviw on GH/CI
 
 ### Demo 3: Agent+MCP, Coding Agent
-- [ ] [07 Build MCP](prompts/04-create-superheroes-mcp.prompt.md): Create a Superheroes MCP to better understand the Superhero data schema
+- [ ] [07 Build MCP](prompts/04-create-superheroes-mcp.prompt.md): Plan & Implment a Superheroes MCP to better understand the Superhero data schema
 - [ ] **08 GitHub MCP**: Create and list issues in GitHub using MCP (issue: add docs to App.js)
-- [ ] **09 Coding Agent**: #assign_copilot_to_issue / "Delegate" button - delegate to Coding Agent to work in the background
+- [ ] **09 Coding Agent**: #assign_copilot_to_issue / "Delegate" button - delegate to Cloud Coding Agent, see AGENT SESSIONS tab and [PR link](https://github.com/commit-ai/copilot-ts-workshop-two/pull/18)
 - [ ] [10 Playwright Tests](prompts/08-adding-e2e-playwright-tests.md): Generate frontend Playwrite tests (as AI TDD)
 - [ ] [11 QA Playwright MCP + Custom Agent](prompts/09-a-playwright-mcp-with-chatmode-vsc.md): use Playwrite MCP to add edge cases
 
