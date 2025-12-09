@@ -3,82 +3,64 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { z } from "zod";
-// ESM __dirname workaround
+import z from "zod";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-/**
-* Loads the superheroes data from the JSON file.
-* Throws a descriptive error if loading fails.
-*/
+// Data Loading Function
 async function loadSuperheroes() {
-    const dataPath = path.join(__dirname, "../data/superheroes.json");
     try {
-        const data = await fs.promises.readFile(dataPath, "utf8");
+        const data = await fs.promises.readFile(path.join(__dirname, "../data", "superheroes.json"), "utf-8");
         return JSON.parse(data);
     }
     catch (err) {
         throw new Error(`Failed to load superheroes data: ${err instanceof Error ? err.message : String(err)}`);
     }
 }
-/**
-* Formats superhero data as a Markdown string.
-*/
+// Markdown Formatting Function
 function formatSuperheroMarkdown(hero) {
-    const stats = hero.powerstats;
-    return [
-        `Here is the data for ${hero.name} retrieved using the superheroes MCP:\n`,
-        `• Name: ${hero.name}`,
-        `• Image: <img src=\"${hero.image}\" alt=\"${hero.name}\"/>`,
-        `• Powerstats:`,
-        `  • Intelligence: ${stats.intelligence}`,
-        `  • Strength: ${stats.strength}`,
-        `  • Speed: ${stats.speed}`,
-        `  • Durability: ${stats.durability}`,
-        `  • Power: ${stats.power}`,
-        `  • Combat: ${stats.combat}`
-    ].join("\n");
+    return `Here is the data for ${hero.name} retrieved using the superheroes MCP:\n\n• Name: ${hero.name}\n• Image: <img src="${hero.image}" alt="${hero.name}"/>\n• Powerstats:\n  • Intelligence: ${hero.powerstats.intelligence}\n  • Strength: ${hero.powerstats.strength}\n  • Speed: ${hero.powerstats.speed}\n  • Durability: ${hero.powerstats.durability}\n  • Power: ${hero.powerstats.power}\n  • Combat: ${hero.powerstats.combat}`;
 }
-// --- MCP Server Setup ---
+// MCP Server Configuration
 const server = new McpServer({
     name: "superheroes-mcp",
     version: "1.0.0",
-    capabilities: {
-        resources: {},
-        tools: {},
-    },
+    // capabilities are managed internally; keeping empty placeholders per prompt
 });
-// --- Tool: Get Superhero by Name or ID ---
-server.tool("get_superhero", "Get superhero details by name or id", {
-    name: z.string().describe("Name of the superhero (optional)"),
-    id: z.string().describe("ID of the superhero (optional)"),
+// Tool Definition using registerTool (per SDK)
+server.registerTool("get_superhero", {
+    description: "Get superhero details by name or id",
+    inputSchema: {
+        name: z.string().optional().describe("Name of the superhero (optional)"),
+        id: z.string().optional().describe("ID of the superhero (optional)"),
+    },
 }, async ({ name, id }) => {
     const superheroes = await loadSuperheroes();
-    const nameLc = name?.toLowerCase();
-    const idStr = id?.toString();
-    // Find superhero by name (case-insensitive) or id
-    const superhero = superheroes.find((hero) => {
-        const heroNameLc = hero.name?.toLowerCase() ?? "";
-        const heroIdStr = hero.id?.toString() ?? "";
+    const nameLc = (name ?? "").toLowerCase();
+    const idStr = id ?? "";
+    const hero = superheroes.find((h) => {
+        const heroNameLc = h.name?.toLowerCase() ?? "";
+        const heroIdStr = h.id?.toString() ?? "";
         return (nameLc && heroNameLc === nameLc) || (idStr && heroIdStr === idStr);
     });
-    if (!superhero) {
+    if (!hero) {
         throw new Error("Superhero not found");
     }
+    const markdown = formatSuperheroMarkdown(hero);
     return {
         content: [
             {
                 type: "text",
-                text: formatSuperheroMarkdown(superhero),
+                text: markdown,
             },
         ],
     };
 });
-// --- Main Entrypoint ---
+// Main Function
 async function main() {
     const transport = new StdioServerTransport();
     await server.connect(transport);
     console.error("Superhero MCP Server running on stdio");
 }
+// Error Handling
 main().catch((error) => {
     console.error("Fatal error in main():", error);
     process.exit(1);

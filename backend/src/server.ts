@@ -72,14 +72,88 @@ app.get('/api/superheroes', async (req, res) => {
 });
 
 /**
- * GET /api/superheroes/:id
- * Returns a single superhero by their unique ID.
+ * GET /api/superheroes/compare
+ * Compares two superheroes by their unique IDs and returns a breakdown of their powerstats.
  *
- * Params: id (string) - The unique identifier of the superhero
- * Response: 200 OK - Superhero object
- *           404 Not Found - If the superhero does not exist
- *           500 Internal Server Error - If data cannot be read
+ * Query Parameters:
+ *   id1 (string|number) - The unique identifier of the first superhero
+ *   id2 (string|number) - The unique identifier of the second superhero
+ *
+ * Response:
+ *   200 OK - JSON object with comparison results (id1, id2, categories, overall_winner)
+ *   400 Bad Request - If either id1 or id2 is missing or invalid
+ *   404 Not Found - If either superhero does not exist
+ *   500 Internal Server Error - If data cannot be read
  */
+app.get('/api/superheroes/compare', async (req, res) => {
+  const id1Raw = req.query.id1;
+  const id2Raw = req.query.id2;
+
+  // Validate that both id1 and id2 are provided and are valid numbers
+  if (!id1Raw || !id2Raw) {
+    res.status(400).send('Both id1 and id2 query parameters are required');
+    return;
+  }
+  const id1 = Number(id1Raw);
+  const id2 = Number(id2Raw);
+  if (isNaN(id1) || isNaN(id2)) {
+    res.status(400).send('Both id1 and id2 must be valid numeric values');
+    return;
+  }
+  if (id1 === id2) {
+    res.status(400).send('Bad request. Comparing a hero with itself not allowed');
+    return;
+  }
+  try {
+    const superheroes = await loadSuperheroes();
+    const hero1 = superheroes.find((h: any) => Number(h.id) === id1);
+    const hero2 = superheroes.find((h: any) => Number(h.id) === id2);
+
+    if (!hero1 || !hero2) {
+      res.status(404).send('Superhero not found');
+      return;
+    }
+
+    const STAT_ORDER = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
+    const categories: Array<Record<string, any>> = [];
+    let hero1Wins = 0;
+    let hero2Wins = 0;
+
+    STAT_ORDER.forEach((stat) => {
+      const v1 = Number(hero1.powerstats[stat]) || 0;
+      const v2 = Number(hero2.powerstats[stat]) || 0;
+      let winner: 1 | 2 | 'tie' = 'tie';
+      if (v1 > v2) {
+        winner = 1;
+        hero1Wins++;
+      } else if (v2 > v1) {
+        winner = 2;
+        hero2Wins++;
+      }
+      categories.push({
+        name: stat,
+        winner,
+        id1_value: v1,
+        id2_value: v2,
+      });
+    });
+
+    let overall_winner: 1 | 2 | 'tie' = 'tie';
+    if (hero1Wins > hero2Wins) overall_winner = 1;
+    else if (hero2Wins > hero1Wins) overall_winner = 2;
+
+    res.json({
+      id1,
+      id2,
+      categories,
+      overall_winner,
+    });
+  } catch (err) {
+    console.error('Error loading superheroes data for compare:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 app.get('/api/superheroes/:id', async (req, res) => {
   const { id } = req.params;
   try {
