@@ -14,3 +14,4 @@ yarn-error.log*
 
 test-results/
 .vscode/
+.vscode/mcp.json
