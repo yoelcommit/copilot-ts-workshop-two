@@ -7,6 +7,7 @@
 - [ ] No local changes, clean working tree
 - [ ] Make sure Agent Skills are enabled (with the chat.useAgentSkills setting)
 - [ ] Verify GitHub MCP and Playwright MCP are properly configured in mcp.json before starting: [.vscode/mcp.json](../.vscode/mcp.json)
+- [ ] Start backend and frontend dev servers.
 
 ## What We'll Cover
 We will implement a feature from idea to production using an agentic coding workflow with GitHub Copilot.
