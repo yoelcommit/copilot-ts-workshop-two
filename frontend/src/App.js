@@ -5,6 +5,9 @@ function App() {
   const [superheroes, setSuperheroes] = useState([]);
   const [selectedHeroes, setSelectedHeroes] = useState([]);
   const [currentView, setCurrentView] = useState('table'); // 'table' or 'comparison'
+  const [comparisonResult, setComparisonResult] = useState(null);
+  const [isComparing, setIsComparing] = useState(false);
+  const [comparisonError, setComparisonError] = useState(null);
 
   useEffect(() => {
     fetch('/api/superheroes')
@@ -32,45 +35,65 @@ function App() {
     return selectedHeroes.some(h => h.id === heroId);
   };
 
-  const handleCompare = () => {
-    if (selectedHeroes.length === 2) {
-      setCurrentView('comparison');
+  const handleCompare = async () => {
+    if (selectedHeroes.length !== 2) return;
+
+    const [hero1, hero2] = selectedHeroes;
+    setCurrentView('comparison');
+    setIsComparing(true);
+    setComparisonError(null);
+    setComparisonResult(null);
+
+    try {
+      const response = await fetch(`/api/superheroes/compare?id1=${hero1.id}&id2=${hero2.id}`);
+      if (!response.ok) {
+        throw new Error('Failed to compare heroes');
+      }
+      const data = await response.json();
+      setComparisonResult(data);
+    } catch (error) {
+      console.error('Error comparing superheroes:', error);
+      setComparisonError('Unable to compare heroes right now. Please try again.');
+    } finally {
+      setIsComparing(false);
     }
   };
 
   const handleBackToTable = () => {
     setCurrentView('table');
     setSelectedHeroes([]);
+    setComparisonResult(null);
+    setComparisonError(null);
+    setIsComparing(false);
   };
 
-  const calculateWinner = (hero1, hero2) => {
-    const stats = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
+  const getScoreFromCategories = (categories, hero1Id, hero2Id) => {
     let hero1Score = 0;
     let hero2Score = 0;
-    
-    stats.forEach(stat => {
-      if (hero1.powerstats[stat] > hero2.powerstats[stat]) {
-        hero1Score++;
-      } else if (hero2.powerstats[stat] > hero1.powerstats[stat]) {
-        hero2Score++;
-      }
+
+    categories.forEach(category => {
+      const winner = category.winner;
+      if (winner === hero1Id) hero1Score++;
+      if (winner === hero2Id) hero2Score++;
     });
 
-    if (hero1Score > hero2Score) {
-      return { winner: hero1, score: `${hero1Score}-${hero2Score}` };
-    } else if (hero2Score > hero1Score) {
-      return { winner: hero2, score: `${hero2Score}-${hero1Score}` };
-    } else {
-      return { winner: null, score: `${hero1Score}-${hero2Score}` };
-    }
+    return `${hero1Score}-${hero2Score}`;
+  };
+
+  const formatStatLabel = (stat) => {
+    if (!stat) return 'Unknown';
+    const text = String(stat);
+    return text.charAt(0).toUpperCase() + text.slice(1);
   };
 
   const renderComparison = () => {
     if (selectedHeroes.length !== 2) return null;
     
     const [hero1, hero2] = selectedHeroes;
-    const result = calculateWinner(hero1, hero2);
-    const stats = ['intelligence', 'strength', 'speed', 'durability', 'power', 'combat'];
+    const categories = comparisonResult?.categories ?? [];
+    const overallWinner = comparisonResult?.overall_winner ?? null;
+    const winnerName = overallWinner === hero1.id ? hero1.name : overallWinner === hero2.id ? hero2.name : null;
+    const score = comparisonResult?.score ?? getScoreFromCategories(categories, hero1.id, hero2.id);
 
     return (
       <div className="comparison-view">
@@ -95,42 +118,57 @@ function App() {
           </div>
         </div>
 
-        <div className="stats-comparison">
-          {stats.map(stat => {
-            const stat1 = hero1.powerstats[stat];
-            const stat2 = hero2.powerstats[stat];
-            const winner = stat1 > stat2 ? 'hero1' : stat1 < stat2 ? 'hero2' : 'tie';
-            
-            return (
-              <div key={stat} className="stat-row">
-                <div className={`stat-value ${winner === 'hero1' ? 'winner' : ''}`}>
-                  {stat1}
-                </div>
-                <div className="stat-name">
-                  {stat.charAt(0).toUpperCase() + stat.slice(1)}
-                </div>
-                <div className={`stat-value ${winner === 'hero2' ? 'winner' : ''}`}>
-                  {stat2}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+        {isComparing && (
+          <div className="comparison-loading">Loading comparison...</div>
+        )}
 
-        <div className="final-result">
-          <h2>Final Result</h2>
-          {result.winner ? (
-            <div className="winner-announcement">
-              <h3>🏆 {result.winner.name} Wins!</h3>
-              <p>Score: {result.score}</p>
+        {comparisonError && (
+          <div className="comparison-error">{comparisonError}</div>
+        )}
+
+        {categories.length > 0 && (
+          <>
+            <div className="stats-comparison">
+              {categories.map(category => {
+                const stat = category.stat ?? category.name ?? category.category;
+                const stat1 = category.hero1 ?? category.hero1_value ?? category.left;
+                const stat2 = category.hero2 ?? category.hero2_value ?? category.right;
+                const winner = category.winner;
+                const statLabel = formatStatLabel(stat);
+                const statKey = stat ?? statLabel;
+
+                return (
+                  <div key={statKey} className="stat-row">
+                    <div className={`stat-value ${winner === hero1.id ? 'winner' : ''}`}>
+                      {stat1}
+                    </div>
+                    <div className="stat-name">
+                      {statLabel}
+                    </div>
+                    <div className={`stat-value ${winner === hero2.id ? 'winner' : ''}`}>
+                      {stat2}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
-          ) : (
-            <div className="tie-announcement">
-              <h3>🤝 It's a Tie!</h3>
-              <p>Score: {result.score}</p>
+
+            <div className="final-result">
+              <h2>Final Result</h2>
+              {winnerName ? (
+                <div className="winner-announcement">
+                  <h3>🏆 {winnerName} Wins!</h3>
+                  <p>Score: {score}</p>
+                </div>
+              ) : (
+                <div className="tie-announcement">
+                  <h3>🤝 It's a Tie!</h3>
+                  <p>Score: {score}</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     );
   };
@@ -148,7 +186,7 @@ function App() {
         <button 
           className="compare-button" 
           onClick={handleCompare}
-          disabled={selectedHeroes.length !== 2}
+          disabled={selectedHeroes.length !== 2 || isComparing}
         >
           Compare Heroes
         </button>

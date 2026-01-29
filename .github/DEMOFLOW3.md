@@ -7,6 +7,7 @@
 - [ ] No local changes, clean working tree
 - [ ] Make sure Agent Skills are enabled (with the chat.useAgentSkills setting)
 - [ ] Verify GitHub MCP and Playwright MCP are properly configured in mcp.json before starting: [.vscode/mcp.json](../.vscode/mcp.json)
+- [ ] npx playwright install in frontend folder
 - [ ] Start backend and frontend dev servers.
 
 ## What We'll Cover
@@ -25,7 +26,7 @@ graph TD
     D1 --> E[04 Monitor in AgentHQ]
     D2 --> E
     
-    E --> F[05 Validate Tests]
+    E --> F[05 Validate E2E Tests]
     F --> G[06 Review - Security Skill]
     G --> H[07 Local Code Review]
     H --> I[08 Add Documentation]
@@ -54,11 +55,11 @@ Note: this allows for better, more concise context and plan quality.
     Using subagents for research, analyze GitHub issue #21 "Refactor superhero comparison feature to use a Backend API instead of Frontend logic".
 
     Create a detailed implementation plan that should include:
-    1. Backend: New /api/superheroes/compare endpoint (see prompts/10-BE-refactor-add-compare-api.md for API spec)
-    2. Frontend: Refactor to consume the new API, keep UI unchanged
-    3. Test coverage requirements for both
-
-    Output the plan in markdown format I can save and reference in later steps.
+    Phase 1. Backend: New /api/superheroes/compare endpoint (see prompts/10-BE-refactor-add-compare-api.md for API spec)
+    Validate Backend tests pass
+    Phase 2. Frontend: Refactor to consume the new API, keep UI unchanged
+    Validate Frontend tests pass
+    Add e2e tests to verify functionality
     ```
 
     📄 **Backup Plan Document**: [prompts/15-refactor-be-fe-feature-plan.md](prompts/15-refactor-be-fe-feature-plan.md)
@@ -66,40 +67,32 @@ Note: this allows for better, more concise context and plan quality.
 
 - [ ] **03 Implement Feature using Background Agents FE/BE**: Implement the feature using Background Agents (FE + BE in parallel)
 
-**Backend Prompt (Sonnet 4.5 - click "Send to Background"):**
-📄 Note: Use the plan created in step 2 as context.
+**Backend Prompt (GPT-5.2-Codex - click "Send to Background"):**
+📄 Note: Use the plan created in step 2 as context: 
+1. Switch to Agent + GPT-5.2-Codex
+2. Enter Prompt:
 ```
-# Role and Objective
-Implement superhero comparison API endpoint.
+Implement ONLY Phase 1 of the plan:
+Add superhero comparison API endpoint:
 
-# Instructions
-- Create GET endpoint at /api/superheroes/compare?id1=<number>&id2=<number> in backend/src/server.ts
-- Compare heroes across 6 categories: intelligence, strength, speed, durability, power, combat
-- Return JSON with categories array (each with name, winner, id1_value, id2_value) and overall_winner
-- Handle errors with {error: string, status: "invalid_request"}
-- Add unit tests in backend/tests/server.test.ts
-
-# Stop Condition
-Run: cd backend && npm run test
-All tests must pass.
+Create a GET endpoint at:
+/api/superheroes/compare?id1=<number>&id2=<number> 
+in backend/src/server.ts
 ```
+3. Run in the background.
 
 **Frontend Prompt (GPT-4.1 - click "Send to Background"):**.
 📄 Note: Use the plan created in step 2 as context.
+1. Switch to Agent + GPT-4.1
+2. Add App.js to context (if not already)
+3. Enter Prompt:
 ```
-# Role and Objective  
-Refactor frontend to use the new comparison API.
-
-# Instructions
-- Modify frontend/src/App.js to call /api/superheroes/compare?id1=X&id2=Y instead of local calculateWinner logic
-- Keep ALL UI unchanged - only change data fetching
-- Remove unused comparison logic after refactor
-- Add unit tests for the refactored comparison logic in frontend/tests/
-
-# Stop Condition
-Run: cd frontend && npx playwright test --reporter=line
-All E2E tests must pass.
+Implement ONLY Phase 2 of the plan:
+Refactor frontend to call new /api/superheroes/compare endpoint 
+instead of current logic
+Keep UI unchanged.
 ```
+4. Run in the background.
 
 - [ ] **04 Track in AgentHQ**: Look at the AGENT SESSIONS tab and track progress of the background agents
 - [ ] **05 Validate Tests**: Run tests and verify all implementations work correctly.
@@ -120,9 +113,9 @@ NOTE: To verify skill is activated, you should see in Copilot output:
 ```
 
 - [ ] **07 Local Code Review**: Use Copilot in VS Code to perform a local code review (no need to fix)
-- [ ] **08 Add Documentation**: Add documentation for the new comparison API
+- [ ] **08 Add Documentation**: Add documentation for the new comparison API:
 
-**Background Agent (CLI)**
+1. **Send to background Agent (CLI)**
 Click "Send to Background" button with this prompt:
 ```
 Add JSDoc documentation for the superhero comparison API:
@@ -132,10 +125,10 @@ Add JSDoc documentation for the superhero comparison API:
 ```
 
 
-**Demo points:**
-1. Show the worktree/session created
-2. Show the files modified
-3. Review the generated documentation
+2. **Demo points:**
+    1. Show the worktree/session created
+    2. Show the files modified
+    3. Review the generated documentation
 - [ ] **09 QA - Test Feature**: Use Playwright MCP to test the feature is working as described in issue.
 
 **Prompt (Playwright-Tester mode):**
@@ -143,7 +136,16 @@ Add JSDoc documentation for the superhero comparison API:
 Use Playwright MCP to test the feature is working as described in issue #21 in GitHub.
 ```
 
-- [ ] **10 Create PR with MCP**: Create a pull request for the new feature using GitHub MCP, attach to relevant issue
+- [ ] **10 Create PR with MCP**: 
+Use GitHub MCP to create a Pull Request for the changes made in the feature implementation.
+**Prompt:**
+```
+Create a PR for issue #21
+Use the following details (add title and description):
+- Linked Issue: #21
+- Reviewers: @ofirn
+- Assignees: @yoelcommit
+```
 - [ ] **11 Automated Code Review in GH CI**: Use Copilot to perform an automated code review in GitHub CI
 
 
