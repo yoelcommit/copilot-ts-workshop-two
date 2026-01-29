@@ -153,14 +153,17 @@ Use the following details (add title and description):
 
 **Key Tips & Best Practices:**
 - [ ] Context: Start a NEW session for every new task/topic!
-- [ ] Customize: via instructions, prompts (all IDEs) + chatmodes (VS Code)
-- [ ] Customize: Awesome prompts+MCPs repo at https://promptboost.dev
+- [ ] Customize: via instructions, prompts, agents, skills
+- [ ] Skills: Build and use custom skills to extend Copilot capabilities
 - [ ] Agent: Use (or build) MCPs where it makes sense
-- [ ] Agent: Never "Accpet" until happy
+- [ ] Agent: Never "Accpet" until happy with result
 - [ ] Agent: Restore Checkpoint
 - [ ] Agent: TDD (Test Driven Dev) as Agent stop condition and feedback loop
 - [ ] Agent: should run CLI commands to close feedback loop
 - [ ] Coding Agent: delegate to a background agent in the cloud
-- [ ] Models: Choosing the right models: https://docs.github.com/en/copilot/reference/ai-models/model-comparison
+- [ ] Coding Agent: Break large tasks into smaller sub-tasks
+- [ ] Plan: Use subagents for research
 - [ ] Review: Use AI for reviewing code, not just generating it
-- [ ] CLI: For a terminal-native experience
+- [ ] CLI: For a terminal-native experience & cross-project workspaces
+- [ ] Monitor: Use AgentHQ to monitor and manage background agents
+- [ ] Models: Choosing the right models: https://docs.github.com/en/copilot/reference/ai-models/model-comparison
