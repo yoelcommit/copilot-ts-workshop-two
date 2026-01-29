@@ -10,6 +10,12 @@
 			"command": "npx",
 			"args": ["-y", "chrome-devtools-mcp@latest"]
 		},
+		"superheroes-mcp": {
+           "command": "node",
+           "args": [
+               "${workspaceFolder}/mcp/build/index.js"
+           ]
+       },
 	   "github": {
       		"type": "http",
       		"url": "https://api.githubcopilot.com/mcp/"
