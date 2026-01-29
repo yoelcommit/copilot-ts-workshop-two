@@ -112,10 +112,12 @@ NOTE: To verify skill is activated, you should see in Copilot output:
 2. Read SKILL.md file
 ```
 
-- [ ] **07 Local Code Review**: Use Copilot in VS Code to perform a local code review (no need to fix)
-- [ ] **08 Add Documentation**: Add documentation for the new comparison API:
+- [ ] **07 Local Code Review**: 
+Use Copilot in VS Code to perform a local code review (no need to fix)
+- [ ] **08 Add Documentation**: 
+Add documentation for the new comparison API
 
-1. **Send to background Agent (CLI)**
+**Background Agent (CLI)**
 Click "Send to Background" button with this prompt:
 ```
 Add JSDoc documentation for the superhero comparison API:
