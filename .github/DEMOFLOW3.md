@@ -55,7 +55,7 @@ Note: this allows for better, more concise context and plan quality.
     Using subagents for research, analyze GitHub issue #21 "Refactor superhero comparison feature to use a Backend API instead of Frontend logic".
 
     Create a detailed implementation plan that should include:
-    Phase 1. Backend: New /api/superheroes/compare endpoint (see prompts/10-BE-refactor-add-compare-api.md for API spec)
+    Phase 1. Backend: New /api/superheroes/compare endpoint
     Validate Backend tests pass
     Phase 2. Frontend: Refactor to consume the new API, keep UI unchanged
     Validate Frontend tests pass
