@@ -156,7 +156,7 @@ Use the following details (add title and description):
 - [ ] Customize: via instructions, prompts, agents, skills
 - [ ] Skills: Build and use custom skills to extend Copilot capabilities
 - [ ] Agent: Use (or build) MCPs where it makes sense
-- [ ] Agent: Never "Accpet" until happy with result
+- [ ] Agent: Never "Accept" until happy with result
 - [ ] Agent: Restore Checkpoint
 - [ ] Agent: TDD (Test Driven Dev) as Agent stop condition and feedback loop
 - [ ] Agent: should run CLI commands to close feedback loop
