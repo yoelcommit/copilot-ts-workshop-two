@@ -14,7 +14,7 @@ flowchart TD
 ```
 
 ### Demo 1: Instructions, Prompts, Modes
-- [ ] [01 Project Walkthrough](prompts/01-project-overview.md): Quick walkthrough of the project using Copilot + Running the FE/BE
+- [ ] [01 Project Walkthrouhg](prompts/01-project-overview.md): Quick walkthrough of the project using Copilot + Running the FE/BE
 - [ ] [02 Instructions](prompts/02-generate-instructions.md): Generate copilot instructions for this project - using Copilot
 - [ ] [03 Prompts](prompts/11.1-api-security-review.prompt.md): use task-specific prompt to review the APIs for Security issues
 - [ ] 04 Chat Modes: Review several modes: [Plan](chatmodes/Plan.chatmode.md), [Debug](agents/Debug.agent.md), [4.1-Beast](chatmodes/4.1-Beast-v3.1.chatmode.md)
