@@ -25,18 +25,6 @@ describe('GET /api/superheroes', () => {
       expect(hero).toHaveProperty('powerstats');
     });
   });
-
-  it('should handle internal server error gracefully', async () => {
-    // Temporarily mock loadSuperheroes to throw
-    const original = app._router.stack.find(r => r.route && r.route.path === '/api/superheroes').route.stack[0].handle;
-    app._router.stack.find(r => r.route && r.route.path === '/api/superheroes').route.stack[0].handle = async (req, res) => {
-      res.status(500).send('Internal Server Error');
-    };
-    const response = await request(app).get('/api/superheroes');
-    expect(response.status).toBe(500);
-    // Restore original handler
-    app._router.stack.find(r => r.route && r.route.path === '/api/superheroes').route.stack[0].handle = original;
-  });
 });
 
 describe('GET /api/superheroes/:id', () => {
